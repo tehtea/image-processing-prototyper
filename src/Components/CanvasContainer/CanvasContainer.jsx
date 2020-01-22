@@ -1,8 +1,4 @@
-import React, {useState} from "react";
-import update from "immutability-helper";
-import {useDrop} from "react-dnd";
-import ItemTypes from "../ItemTypes";
-import Card from "../Card/Card";
+import React from "react";
 import "../../Constants";
 import {INTERMEDIATE_OUTPUT_PREFIX} from "../../Constants";
 
@@ -16,16 +12,6 @@ const CanvasContainer = ({cards}) => {
                     id={INTERMEDIATE_OUTPUT_PREFIX + index}
                 >
                 </canvas>
-                // <Card
-                //     key={card.id}
-                //     id={`${card.id}`}
-                //     text={card.text}
-                //     moveCard={moveCard}
-                //     findCard={findCard}
-                //     deleteCard={deleteCard}
-                //     processingOptions={card.processingOptions}
-                //     updateCard={updateCard}
-                // />
             ))}
         </div>
     );

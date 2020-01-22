@@ -9,6 +9,7 @@ const WrappedAlgorithms = {
                                     processingOptions.upperThreshold,
                                     processingOptions.sobelApertureSize,
                                     processingOptions.moreAccurateGradient);
+
         console.log("performing Canny with the following parameters: ");
         console.log(processingOptions);
         window.cv.imshow(outputCanvasID, dst);

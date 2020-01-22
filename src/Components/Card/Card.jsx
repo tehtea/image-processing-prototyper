@@ -47,9 +47,8 @@ const Card = ({id, text, moveCard, findCard, deleteCard, processingOptions, upda
                 ></p>
             </span>
             <br/>
-            <form className={"hello"}
-                  noValidate
-                  autoComplete="off"
+            <div
+                className={"hello"}
             >
                 {Object.keys(processingOptions).map((option) => {
                     return (
@@ -77,18 +76,9 @@ const Card = ({id, text, moveCard, findCard, deleteCard, processingOptions, upda
 
                             }}
                         />
-
-                        // <label>
-                        //     {option}
-                        //     <input type="text"
-                        //            value={text}
-                        //
-                        //            placeholder={processingOptions[option]}
-                        //     />
-                        // </label>
                     );
                 })}
-            </form>
+            </div>
         </div>
     );
 };
