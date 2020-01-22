@@ -1,0 +1,27 @@
+.card {
+    border: 1px dashed gray;
+    padding: 0.5rem 1rem;
+    margin-bottom: .5rem;
+    background-color: white;
+    cursor: move;
+    color: black;
+}
+
+.card > .delete-button > p {
+    text-align: right;
+    float: right;
+    margin: 0 auto;
+    /*padding-top: 5px;*/
+    /*padding-top: 5px;*/
+    /*padding-top: 5px;*/
+    color: red;
+}
+
+.card > form {
+    display: flex;
+    flex-direction: column;
+}
+
+.delete-button:hover {
+    cursor: pointer;
+}
