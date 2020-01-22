@@ -9,14 +9,13 @@ import Webcam from "react-webcam";
 import {DndProvider} from 'react-dnd'
 import Backend from 'react-dnd-html5-backend'
 import AlgoContainer from "./Components/Container/AlgoContainer";
-import {ITEMS} from "./InitialCardStates";
 
 // for the intermediate output
 import CanvasContainer from "./Components/CanvasContainer/CanvasContainer";
 
 import {INTERMEDIATE_OUTPUT_PREFIX} from "./Constants";
 import {resolveOpenCVErrorNumber} from "./utils.js";
-import {functionIDLookup} from "./Algorithms";
+import {functionIDLookup, InitialCardStates} from "./Algorithms";
 
 function App() {
     // life saviour: https://upmostly.com/tutorials/setinterval-in-react-components-using-hooks
@@ -77,7 +76,7 @@ function App() {
     };
     const webcamRef = React.useRef(null);
 
-    let [cards, setCards] = useState(ITEMS);
+    let [cards, setCards] = useState(InitialCardStates);
 
     // entry point for image processing
     const onUserMedia = () => {

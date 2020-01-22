@@ -65,7 +65,7 @@ const WrappedAlgorithms = {
         return document.getElementById(outputCanvasID);
     },
 
-    _binaryThresholding: function _binaryThresholding(inputCanvas, outputCanvasID, processingOptions) {
+    _simpleBinaryThresholding: function _binaryThresholding(inputCanvas, outputCanvasID, processingOptions) {
         let src = window.cv.imread(inputCanvas);
         let dst = new window.cv.Mat();
 
@@ -80,10 +80,72 @@ const WrappedAlgorithms = {
 
         return document.getElementById(outputCanvasID);
     },
+
+    _otsuThresholding: function _otsuThresholding(inputCanvas, outputCanvasID, processingOptions) {
+        let src = window.cv.imread(inputCanvas);
+        let dst = new window.cv.Mat();
+
+        window.cv.threshold(src, dst, processingOptions.threshVal, 255, window.cv.THRESH_OTSU);
+        window.cv.imshow(outputCanvasID, dst);
+
+        console.log("performing otsu thresholding with the following parameters: ");
+        console.log(processingOptions);
+
+        src.delete();
+        dst.delete();
+
+        return document.getElementById(outputCanvasID);
+    },
 };
 
-
 export default WrappedAlgorithms;
+
+export const InitialCardStates = [
+    {
+        id: 1,
+        text: "RGB to Grayscale",
+        processingOptions: {}
+    },
+    {
+        id: 2,
+        text: "Histogram Equalization",
+        processingOptions: {}
+    },
+    {
+        id: 3,
+        text: "Simple Image Thresholding",
+        processingOptions: {
+            threshVal: 127,
+        }
+    },
+    {
+        id: 4,
+        text: "Median Filtering",
+        processingOptions: {
+            kernelSize: 5,
+        }
+    },
+    {
+        id: 5,
+        text: "Canny Edge Detection",
+        processingOptions: {
+            lowerThreshold: 50,
+            upperThreshold: 100,
+            sobelApertureSize: 3,
+            moreAccurateGradient: false,
+        }
+    },
+    {
+        id: 6,
+        text: "Otsu Binarization",
+        processingOptions: {},
+    },
+    {
+        id: 7,
+        text: "Hough Circles Transform (For circle detection)",
+        processingOptions: {},
+    }
+];
 
 export function functionIDLookup(id) {
     let functionToReturn = () => {};
@@ -97,7 +159,7 @@ export function functionIDLookup(id) {
             break;
         }
         case 3: {
-            functionToReturn = WrappedAlgorithms._binaryThresholding;
+            functionToReturn = WrappedAlgorithms._simpleBinaryThresholding;
             break;
         }
         case 4: {
@@ -109,6 +171,7 @@ export function functionIDLookup(id) {
             break;
         }
         case 6: {
+            functionToReturn = WrappedAlgorithms._otsuThresholding;
             break;
         }
         case 7: {
