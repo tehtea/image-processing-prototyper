@@ -55,7 +55,7 @@ const AlgoContainer = ({cards, setCards}) => {
         <>
             <div ref={drop}
                  className={"drag-and-drop-container"} >
-                {/*<div style={style}>*/}
+                <h2>Algorithms to run on input video (in order from top to bottom)</h2>
                 {cards.map(card => (
                     <Card
                         key={card.id}

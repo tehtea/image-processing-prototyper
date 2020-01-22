@@ -84,3 +84,38 @@ const WrappedAlgorithms = {
 
 
 export default WrappedAlgorithms;
+
+export function functionIDLookup(id) {
+    let functionToReturn = () => {};
+    switch (id) {
+        case 1: {
+            functionToReturn = WrappedAlgorithms._convertRGBToGray;
+            break;
+        }
+        case 2: {
+            functionToReturn = WrappedAlgorithms._histogramEqualization;
+            break;
+        }
+        case 3: {
+            functionToReturn = WrappedAlgorithms._binaryThresholding;
+            break;
+        }
+        case 4: {
+            functionToReturn = WrappedAlgorithms._medianFilter;
+            break;
+        }
+        case 5: {
+            functionToReturn = WrappedAlgorithms._cannyEdgeDetection;
+            break;
+        }
+        case 6: {
+            break;
+        }
+        case 7: {
+            break;
+        }
+        default: {
+        }
+    }
+    return functionToReturn;
+}

@@ -1,18 +1,22 @@
 import React, {useEffect, useState} from 'react';
 import logo from './logo.svg';
 import './App.css';
+
+// for webcam
 import Webcam from "react-webcam";
 
-import AlgoContainer from "./Components/Container/AlgoContainer";
+// for cards and drag-and-drop
 import {DndProvider} from 'react-dnd'
 import Backend from 'react-dnd-html5-backend'
+import AlgoContainer from "./Components/Container/AlgoContainer";
+import {ITEMS} from "./InitialCardStates";
 
-import WrappedAlgorithms from "./Algorithms";
+// for the intermediate output
 import CanvasContainer from "./Components/CanvasContainer/CanvasContainer";
 
 import {INTERMEDIATE_OUTPUT_PREFIX} from "./Constants";
 import {resolveOpenCVErrorNumber} from "./utils.js";
-import {ITEMS} from "./InitialCardStates";
+import {functionIDLookup} from "./Algorithms";
 
 function App() {
     // life saviour: https://upmostly.com/tutorials/setinterval-in-react-components-using-hooks
@@ -54,36 +58,8 @@ function App() {
 
                 // do sth based on card id
                 try {
-                    switch (card.id) {
-                        case 1: {
-                            currentCanvas = WrappedAlgorithms._convertRGBToGray(currentCanvas, INTERMEDIATE_OUTPUT_PREFIX + i, card.processingOptions);
-                            break;
-                        }
-                        case 2: {
-                            currentCanvas = WrappedAlgorithms._histogramEqualization(currentCanvas, INTERMEDIATE_OUTPUT_PREFIX + i, card.processingOptions); // process the current intermediate output
-                            break;
-                        }
-                        case 3: {
-                            currentCanvas = WrappedAlgorithms._binaryThresholding(currentCanvas, INTERMEDIATE_OUTPUT_PREFIX + i, card.processingOptions);
-                            break;
-                        }
-                        case 4: {
-                            currentCanvas = WrappedAlgorithms._medianFilter(currentCanvas, INTERMEDIATE_OUTPUT_PREFIX + i, card.processingOptions);
-                            break;
-                        }
-                        case 5: {
-                            currentCanvas = WrappedAlgorithms._cannyEdgeDetection(currentCanvas, INTERMEDIATE_OUTPUT_PREFIX + i, card.processingOptions);
-                            break;
-                        }
-                        case 6: {
-                            break;
-                        }
-                        case 7: {
-                            break;
-                        }
-                        default: {
-                        }
-                    }
+                    let functionToRun = functionIDLookup(card.id);
+                    currentCanvas = functionToRun(currentCanvas, INTERMEDIATE_OUTPUT_PREFIX + i, card.processingOptions);
                 } catch (err) {
                     resolveOpenCVErrorNumber(err);
                 }
@@ -114,6 +90,7 @@ function App() {
                 <img src={logo} className="App-logo" alt="logo"/>
                 <div className={"processing-interface"}>
                     <div className={"video-pipeline"}>
+                        <h2>Video Input and Intermediate Outputs (in order from top to bottom)</h2>
                         <Webcam
                             audio={false}
                             ref={webcamRef}
