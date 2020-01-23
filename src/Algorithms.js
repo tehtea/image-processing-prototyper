@@ -1,104 +1,65 @@
+// contains image processing algorithms
 const WrappedAlgorithms = {
-    _cannyEdgeDetection: function _cannyEdgeDetection(inputCanvas, outputCanvasID, processingOptions) {
-        let src = window.cv.imread(inputCanvas);
-        let dst = new window.cv.Mat();
-        window.cv.cvtColor(src, src, window.cv.COLOR_RGB2GRAY, 0);
-
-        // You can try more different parameters
+    _cannyEdgeDetection: function _cannyEdgeDetection(src, dst, processingOptions) {
         window.cv.Canny(src, dst, processingOptions.lowerThreshold,
-                                    processingOptions.upperThreshold,
-                                    processingOptions.sobelApertureSize,
-                                    processingOptions.moreAccurateGradient);
-
-        console.log("performing Canny with the following parameters: ");
-        console.log(processingOptions);
-        window.cv.imshow(outputCanvasID, dst);
-        src.delete();
-        dst.delete();
+            processingOptions.upperThreshold,
+            processingOptions.sobelApertureSize,
+            processingOptions.moreAccurateGradient);
     },
-    _histogramEqualization: function _histogramEqualization(inputCanvas, outputCanvasID, processingOptions) {
-        let src = window.cv.imread(inputCanvas);
-        let dst = new window.cv.Mat();
 
-        if (src.matSize.length > 2) {
-            console.log("cannot do histogram equalization");
-            return document.getElementById(outputCanvasID);
-        }
-
-        // console.log(src);
+    _histogramEqualization: function _histogramEqualization(src, dst, processingOptions) {
         window.cv.cvtColor(src, src, window.cv.COLOR_RGBA2GRAY, 0); // need to leave this here even if its grayscale for some reason otherwise will crash
-        // console.log(src);
         window.cv.equalizeHist(src, dst);
-        window.cv.imshow(outputCanvasID, dst);
-
-        src.delete();
-        dst.delete();
-
-        return document.getElementById(outputCanvasID);
     },
-    _medianFilter: function _medianFilter(inputCanvas, outputCanvasID, processingOptions) {
-        let src = window.cv.imread(inputCanvas);
-        let dst = new window.cv.Mat();
 
-        console.log("performing median blur with the following parameters: ");
-        console.log(processingOptions);
-
+    _medianFilter: function _medianFilter(src, dst, processingOptions) {
         window.cv.medianBlur(src, dst, processingOptions.kernelSize);
-        window.cv.imshow(outputCanvasID, dst);
-
-        src.delete();
-        dst.delete();
-
-        return document.getElementById(outputCanvasID);
     },
 
-    _convertRGBToGray: function _convertRGBToGray(inputCanvas, outputCanvasID, processingOptions) {
-        let src = window.cv.imread(inputCanvas);
-        let dst = new window.cv.Mat();
-
+    _convertRGBToGray: function _convertRGBToGray(src, dst, processingOptions) {
         window.cv.cvtColor(src, dst, window.cv.COLOR_RGBA2GRAY, 0);
-        window.cv.imshow(outputCanvasID, dst);
-
-        src.delete();
-        dst.delete();
-
-        return document.getElementById(outputCanvasID);
     },
 
-    _simpleBinaryThresholding: function _binaryThresholding(inputCanvas, outputCanvasID, processingOptions) {
-        let src = window.cv.imread(inputCanvas);
-        let dst = new window.cv.Mat();
-
+    _simpleBinaryThresholding: function _binaryThresholding(src, dst, processingOptions) {
         window.cv.threshold(src, dst, processingOptions.threshVal, 255, window.cv.THRESH_BINARY);
-        window.cv.imshow(outputCanvasID, dst);
-
-        console.log("performing binary thresholding with the following parameters: ");
-        console.log(processingOptions);
-
-        src.delete();
-        dst.delete();
-
-        return document.getElementById(outputCanvasID);
     },
 
-    _otsuThresholding: function _otsuThresholding(inputCanvas, outputCanvasID, processingOptions) {
-        let src = window.cv.imread(inputCanvas);
-        let dst = new window.cv.Mat();
-
-        window.cv.threshold(src, dst, processingOptions.threshVal, 255, window.cv.THRESH_OTSU);
-        window.cv.imshow(outputCanvasID, dst);
-
-        console.log("performing otsu thresholding with the following parameters: ");
-        console.log(processingOptions);
-
-        src.delete();
-        dst.delete();
-
-        return document.getElementById(outputCanvasID);
+    _otsuThresholding: function _otsuThresholding(src, dst, processingOptions) {
+        window.cv.cvtColor(src, src, window.cv.COLOR_RGBA2GRAY, 0); // need to leave this here even if its grayscale for some reason otherwise will crash
+        // thresh value does not matter for otsu,
+        // so a placeholder value of 69 is placed.
+        window.cv.threshold(src, dst, 69, 255, window.cv.THRESH_OTSU);
     },
+
+    _adaptiveThresholding: function _adaptiveThresholding(src, dst, processingOptions) {
+        window.cv.cvtColor(src, src, window.cv.COLOR_RGBA2GRAY, 0);
+        window.cv.adaptiveThreshold(src, dst, 255, window.cv.ADAPTIVE_THRESH_GAUSSIAN_C, window.cv.THRESH_BINARY, processingOptions.kernelSize, processingOptions.C);
+    }
 };
 
 export default WrappedAlgorithms;
+
+export function executeWrappedAlgorithm(inputCanvas, outputCanvasID, processingOptions, functionToExecute) {
+    console.debug(`---- Executing algorithm: ${functionToExecute} ----`);
+    console.debug("showing some debug information for the algorithm to execute");
+    console.debug("input canvas:");
+    console.debug(inputCanvas);
+    console.debug("output canvas:");
+    console.debug(document.getElementById(outputCanvasID));
+    console.debug("function to execute:");
+    console.debug(functionToExecute);
+    console.debug("================");
+    let src = window.cv.imread(inputCanvas);
+    let dst = new window.cv.Mat();
+
+    functionToExecute(src, dst, processingOptions);
+    window.cv.imshow(outputCanvasID, dst);
+
+    src.delete();
+    dst.delete();
+
+    return document.getElementById(outputCanvasID);
+}
 
 export const InitialCardStates = [
     {
@@ -142,13 +103,18 @@ export const InitialCardStates = [
     },
     {
         id: 7,
-        text: "Hough Circles Transform (For circle detection)",
-        processingOptions: {},
+        text: "Adaptive Thresholding",
+        processingOptions: {
+            kernelSize: 3,
+            C: 2,
+        },
     }
 ];
 
+// look up the function to run based on the id of the card.
 export function functionIDLookup(id) {
-    let functionToReturn = () => {};
+    let functionToReturn = () => {
+    };
     switch (id) {
         case 1: {
             functionToReturn = WrappedAlgorithms._convertRGBToGray;
@@ -175,6 +141,7 @@ export function functionIDLookup(id) {
             break;
         }
         case 7: {
+            functionToReturn = WrappedAlgorithms._adaptiveThresholding;
             break;
         }
         default: {

@@ -1,3 +1,4 @@
+// convert openCV error number into error message
 export function resolveOpenCVErrorNumber(err) {
     if (typeof err === 'undefined') {
         err = '';
@@ -17,5 +18,5 @@ export function resolveOpenCVErrorNumber(err) {
     } else if (err instanceof Error) {
         err = err.stack.replace(/\n/g, '<br>');
     }
-    console.error(err);
+    return(err);
 }

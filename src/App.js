@@ -13,9 +13,10 @@ import AlgoContainer from "./Components/Container/AlgoContainer";
 // for the intermediate output
 import CanvasContainer from "./Components/CanvasContainer/CanvasContainer";
 
-import {INTERMEDIATE_OUTPUT_PREFIX} from "./Constants";
+// for the image processing algorithms
+import {INTERMEDIATE_OUTPUT_PREFIX, DELAY} from "./Constants";
 import {resolveOpenCVErrorNumber} from "./utils.js";
-import {functionIDLookup, InitialCardStates} from "./Algorithms";
+import {executeWrappedAlgorithm, functionIDLookup, InitialCardStates} from "./Algorithms";
 
 function App() {
     // life saviour: https://upmostly.com/tutorials/setinterval-in-react-components-using-hooks
@@ -23,15 +24,16 @@ function App() {
         if (!window.webcam)
             window.webcam = webcamRef.current;
 
+        if (window.cv)
+            console.log('opencv loaded');
+        else {
+            console.log('opencv not loaded, will exit');
+            return;
+        }
+
         const interval = setInterval(() => {
 
             const originalCanvas = window.webcam.getCanvas();
-            if (window.cv)
-                console.log('opencv loaded');
-            else {
-                console.log('opencv not loaded, will exit');
-                return;
-            }
 
             if (!originalCanvas) {
                 return;
@@ -42,29 +44,33 @@ function App() {
             console.log(cards);
             console.log(cards.length);
             for (let i = 0; i < cards.length; i++) {
-                console.log(i);
+                // console.log(i);
                 let card = cards[i];
 
-                // for debug purposes
-                console.log("----- CURRENT CARD STATUSES ----");
-                console.log("CURRENT CANVAS TO INPUT FROM:");
-                console.log(currentCanvas);
-                console.log("CURRENT CANVAS TO OUTPUT TO:");
-                console.log(INTERMEDIATE_OUTPUT_PREFIX + i);
-                console.log("CURRENT SET OF PROCESSING OPTIONS");
-                console.log(card.processingOptions);
-                console.log("///////////");
+                // // for debug purposes
+                // console.log("----- CURRENT CARD STATUSES ----");
+                // console.log("CURRENT CANVAS TO INPUT FROM:");
+                // console.log(currentCanvas);
+                // console.log("CURRENT CANVAS TO OUTPUT TO:");
+                // console.log(INTERMEDIATE_OUTPUT_PREFIX + i);
+                // console.log("CURRENT SET OF PROCESSING OPTIONS");
+                // console.log(card.processingOptions);
+                // console.log("///////////");
 
                 // do sth based on card id
                 try {
                     let functionToRun = functionIDLookup(card.id);
-                    currentCanvas = functionToRun(currentCanvas, INTERMEDIATE_OUTPUT_PREFIX + i, card.processingOptions);
+                    currentCanvas = executeWrappedAlgorithm(currentCanvas,
+                                            INTERMEDIATE_OUTPUT_PREFIX + i,
+                                            card.processingOptions,
+                                            functionToRun);
                 } catch (err) {
-                    resolveOpenCVErrorNumber(err);
+                    console.error(`Error using algorithm of id ${card.id}, error message: ${resolveOpenCVErrorNumber(err)}`);
+                    // resolveOpenCVErrorNumber(err);
                 }
             }
 
-        }, 1000);
+        }, DELAY);
 
         return () => clearInterval(interval);
     });
@@ -88,6 +94,7 @@ function App() {
             <header className="App-header">
                 <img src={logo} className="App-logo" alt="logo"/>
                 <div className={"processing-interface"}>
+                    {/* video pipeline shows the input from the camera detected and all intermediate outputs from each stage */}
                     <div className={"video-pipeline"}>
                         <h2>Video Input and Intermediate Outputs (in order from top to bottom)</h2>
                         <Webcam
@@ -101,6 +108,7 @@ function App() {
                             cards={cards}
                         />
                     </div>
+                    {/* DndProvider needed for drag and drop functionality in AlgoContainer */}
                     <DndProvider backend={Backend}>
                         <AlgoContainer
                             cards={cards}
@@ -108,17 +116,6 @@ function App() {
                         />
                     </DndProvider>
                 </div>
-                <p>
-                    Edit <code>src/App.js</code> and save to reload.
-                </p>
-                <a
-                    className="App-link"
-                    href="https://reactjs.org"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    Learn React
-                </a>
             </header>
         </div>
     );
