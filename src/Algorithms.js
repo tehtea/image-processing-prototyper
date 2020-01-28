@@ -1,4 +1,5 @@
 // contains image processing algorithms
+// TODO: consider a way to make it more scalable to add new algorithms
 const WrappedAlgorithms = {
     _cannyEdgeDetection: function _cannyEdgeDetection(src, dst, processingOptions) {
         window.cv.Canny(src, dst, processingOptions.lowerThreshold,

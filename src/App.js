@@ -66,7 +66,6 @@ function App() {
                         functionToRun);
                 } catch (err) {
                     console.error(`Error using algorithm of id ${card.id}, error message: ${resolveOpenCVErrorNumber(err)}`);
-                    // resolveOpenCVErrorNumber(err);
                 }
             }
 

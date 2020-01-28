@@ -109,6 +109,7 @@ const AlgoContainer = ({cards, setCards}) => {
                     />
                 ))}
             </div>
+            {/* TODO: move the below to another component*/}
             <form style={{
                 marginTop: "50px",
                 border: "1px gray",
@@ -128,7 +129,6 @@ const AlgoContainer = ({cards, setCards}) => {
                     Algorithm Options
                 </InputLabel>
                 <NativeSelect
-                    // value={state.age}
                     onChange={event => {
                         let algoID = Number.parseInt(event.target.value);
                         let [, , processingOptions] = functionIDLookup(algoID);
@@ -138,7 +138,6 @@ const AlgoContainer = ({cards, setCards}) => {
                         console.debug(processingOptions);
                         setPotentialNewCard({algoID, processingOptions});
                     }} inputProps={{
-                    name: 'age',
                     id: 'select-new-algo',
                 }}
                 >
@@ -148,24 +147,6 @@ const AlgoContainer = ({cards, setCards}) => {
                         )
                     })}
                 </NativeSelect>
-                {/*<select*/}
-                {/*    id={"select-new-algo"}*/}
-                {/*    onChange={event => {*/}
-                {/*        let algoID = Number.parseInt(event.target.value);*/}
-                {/*        let [,,processingOptions] = functionIDLookup(algoID);*/}
-                {/*        console.debug("setting new card with parameters:");*/}
-                {/*        console.debug(`algoID: ${algoID} of type ${typeof algoID}`);*/}
-                {/*        console.debug("processing options:");*/}
-                {/*        console.debug(processingOptions);*/}
-                {/*        setPotentialNewCard({algoID, processingOptions});*/}
-                {/*    }}*/}
-                {/*>*/}
-                {/*    {InitialCardStates.map((cardState, id) => {*/}
-                {/*        return (*/}
-                {/*            <option key={id} value={cardState.algoID}>{cardState.text}</option>*/}
-                {/*        )*/}
-                {/*    })}*/}
-                {/*</select>*/}
                 <label htmlFor="options-for-algo"></label>
                 <div id={"options-for-algo"}>
                     <ProcessingParametersContainer
