@@ -25,3 +25,8 @@
 .delete-button:hover {
     cursor: pointer;
 }
+
+.card > .processing-parameters {
+    display: flex;
+    flex-direction: column;
+}

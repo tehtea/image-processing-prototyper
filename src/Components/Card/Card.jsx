@@ -2,7 +2,7 @@ import React from "react";
 import {useDrag, useDrop} from "react-dnd";
 import ItemTypes from "../ItemTypes";
 import './Card.css';
-import TextField from '@material-ui/core/TextField';
+import ProcessingParametersContainer from "../ProcessingParametersContainer";
 
 const Card = ({id, text, moveCard, findCard, deleteCard, processingOptions, updateCard}) => {
     const originalIndex = findCard(id).index;
@@ -30,6 +30,7 @@ const Card = ({id, text, moveCard, findCard, deleteCard, processingOptions, upda
         }
     });
     const opacity = isDragging ? 0 : 1;
+
     return (
         <div
             ref={node => drag(drop(node))}
@@ -48,36 +49,29 @@ const Card = ({id, text, moveCard, findCard, deleteCard, processingOptions, upda
             </span>
             <br/>
             <div
-                className={"hello"}
+                className={"processing-parameters"}
             >
-                {Object.keys(processingOptions).map((option) => {
-                    return (
-                        // // the basic variant is out of date but it has better performance compared to the above
-                        // <TextField id="standard-basic" label={option} variant="outlined"/>
-                        <TextField
-                            key={id + '-' + option}
-                            id={id + '-' + option}
-                            label={option}
-                            type={"number"}
-                            placeholder={processingOptions[option].toString()}
-                            variant="outlined"
-                            onChange={(event) => {
-                                console.log(
-                                    `received a change with the value: ${event.target.value} of type ${typeof(event.target.value)} for property ${option}`);
-                                updateCard(
-                                    id, option, Number.parseInt(event.target.value)
-                                );
-                            }}
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                            style = {{
-                                marginTop: "5px",
-
-                            }}
-                        />
-                    );
-                })}
+                <ProcessingParametersContainer
+                    cardID={id}
+                    processingOptions={processingOptions}
+                    onChange={
+                        (event) => {
+                            let labels = event.target.parentElement.parentElement.getElementsByTagName('label');
+                            for (let i = 0; i < labels.length; i++) {
+                                if (labels[i].htmlFor === event.target.id) {
+                                    let property = labels[i].textContent;
+                                    console.debug(
+                                        `received a change with the value: ${event.target.value} of type ${typeof (event.target.value)} for property ${property}`);
+                                    updateCard(
+                                        id, property, Number.parseInt(event.target.value)
+                                    );
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                >
+                </ProcessingParametersContainer>
             </div>
         </div>
     );

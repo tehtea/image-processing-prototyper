@@ -8,7 +8,7 @@ import Webcam from "react-webcam";
 // for cards and drag-and-drop
 import {DndProvider} from 'react-dnd'
 import Backend from 'react-dnd-html5-backend'
-import AlgoContainer from "./Components/Container/AlgoContainer";
+import AlgoContainer from "./Components/AlgoContainer/AlgoContainer";
 
 // for the intermediate output
 import CanvasContainer from "./Components/CanvasContainer/CanvasContainer";
@@ -41,29 +41,29 @@ function App() {
 
             // something like dequeueing
             let currentCanvas = originalCanvas;
-            console.log(cards);
-            console.log(cards.length);
+            // console.log(cards);
+            // console.log(cards.length);
             for (let i = 0; i < cards.length; i++) {
                 // console.log(i);
                 let card = cards[i];
 
-                // // for debug purposes
-                // console.log("----- CURRENT CARD STATUSES ----");
-                // console.log("CURRENT CANVAS TO INPUT FROM:");
-                // console.log(currentCanvas);
-                // console.log("CURRENT CANVAS TO OUTPUT TO:");
-                // console.log(INTERMEDIATE_OUTPUT_PREFIX + i);
-                // console.log("CURRENT SET OF PROCESSING OPTIONS");
-                // console.log(card.processingOptions);
-                // console.log("///////////");
+                // for debug purposes
+                console.debug("----- CURRENT CARD STATUSES ----");
+                console.debug("CURRENT CANVAS TO INPUT FROM:");
+                console.debug(currentCanvas);
+                console.debug("CURRENT CANVAS TO OUTPUT TO:");
+                console.debug(INTERMEDIATE_OUTPUT_PREFIX + i);
+                console.debug("CURRENT SET OF PROCESSING OPTIONS");
+                console.debug(card.processingOptions);
+                console.debug("///////////");
 
                 // do sth based on card id
                 try {
-                    let functionToRun = functionIDLookup(card.id);
+                    let [functionToRun,,] = functionIDLookup(card.algoID);
                     currentCanvas = executeWrappedAlgorithm(currentCanvas,
-                                            INTERMEDIATE_OUTPUT_PREFIX + i,
-                                            card.processingOptions,
-                                            functionToRun);
+                        INTERMEDIATE_OUTPUT_PREFIX + i,
+                        card.processingOptions,
+                        functionToRun);
                 } catch (err) {
                     console.error(`Error using algorithm of id ${card.id}, error message: ${resolveOpenCVErrorNumber(err)}`);
                     // resolveOpenCVErrorNumber(err);
@@ -91,32 +91,29 @@ function App() {
 
     return (
         <div className="App">
-            <header className="App-header">
-                <img src={logo} className="App-logo" alt="logo"/>
-                <div className={"processing-interface"}>
-                    {/* video pipeline shows the input from the camera detected and all intermediate outputs from each stage */}
-                    <div className={"video-pipeline"}>
-                        <h2>Video Input and Intermediate Outputs (in order from top to bottom)</h2>
-                        <Webcam
-                            audio={false}
-                            ref={webcamRef}
-                            screenshotFormat="image/jpeg"
-                            videoConstraints={videoConstraints}
-                            onUserMedia={onUserMedia}
-                        />
-                        <CanvasContainer
-                            cards={cards}
-                        />
-                    </div>
-                    {/* DndProvider needed for drag and drop functionality in AlgoContainer */}
-                    <DndProvider backend={Backend}>
-                        <AlgoContainer
-                            cards={cards}
-                            setCards={setCards}
-                        />
-                    </DndProvider>
+            <div className={"processing-interface"}>
+                {/* video pipeline shows the input from the camera detected and all intermediate outputs from each stage */}
+                <div className={"video-pipeline"}>
+                    <h2>Video Input and Intermediate Outputs (in order from top to bottom)</h2>
+                    <Webcam
+                        audio={false}
+                        ref={webcamRef}
+                        screenshotFormat="image/jpeg"
+                        videoConstraints={videoConstraints}
+                        onUserMedia={onUserMedia}
+                    />
+                    <CanvasContainer
+                        cards={cards}
+                    />
                 </div>
-            </header>
+                {/* DndProvider needed for drag and drop functionality in AlgoContainer */}
+                <DndProvider backend={Backend}>
+                    <AlgoContainer
+                        cards={cards}
+                        setCards={setCards}
+                    />
+                </DndProvider>
+            </div>
         </div>
     );
 }

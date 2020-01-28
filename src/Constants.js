@@ -1,2 +1,2 @@
 export const INTERMEDIATE_OUTPUT_PREFIX = "intermediate-output-";
-export const DELAY = 50;
+export const DELAY = 500;

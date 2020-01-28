@@ -33,7 +33,12 @@ const WrappedAlgorithms = {
 
     _adaptiveThresholding: function _adaptiveThresholding(src, dst, processingOptions) {
         window.cv.cvtColor(src, src, window.cv.COLOR_RGBA2GRAY, 0);
-        window.cv.adaptiveThreshold(src, dst, 255, window.cv.ADAPTIVE_THRESH_GAUSSIAN_C, window.cv.THRESH_BINARY, processingOptions.kernelSize, processingOptions.C);
+        window.cv.adaptiveThreshold(src, dst,
+            processingOptions.maxValue,
+            window.cv.ADAPTIVE_THRESH_GAUSSIAN_C,
+            window.cv.THRESH_BINARY,
+            processingOptions.kernelSize,
+            processingOptions.C);
     }
 };
 
@@ -64,16 +69,19 @@ export function executeWrappedAlgorithm(inputCanvas, outputCanvasID, processingO
 export const InitialCardStates = [
     {
         id: 1,
+        algoID: 1,
         text: "RGB to Grayscale",
         processingOptions: {}
     },
     {
         id: 2,
+        algoID: 2,
         text: "Histogram Equalization",
         processingOptions: {}
     },
     {
         id: 3,
+        algoID: 3,
         text: "Simple Image Thresholding",
         processingOptions: {
             threshVal: 127,
@@ -81,6 +89,7 @@ export const InitialCardStates = [
     },
     {
         id: 4,
+        algoID: 4,
         text: "Median Filtering",
         processingOptions: {
             kernelSize: 5,
@@ -88,6 +97,7 @@ export const InitialCardStates = [
     },
     {
         id: 5,
+        algoID: 5,
         text: "Canny Edge Detection",
         processingOptions: {
             lowerThreshold: 50,
@@ -98,24 +108,30 @@ export const InitialCardStates = [
     },
     {
         id: 6,
+        algoID: 6,
         text: "Otsu Binarization",
         processingOptions: {},
     },
     {
         id: 7,
+        algoID: 7,
         text: "Adaptive Thresholding",
         processingOptions: {
+            maxValue: 200,
             kernelSize: 3,
             C: 2,
         },
     }
 ];
 
-// look up the function to run based on the id of the card.
-export function functionIDLookup(id) {
+// look up the function to run, its label, and its possible options based on the id of the card.
+// (rationale for not adding these functions into the card directly is to have human-readable label for each algo card)
+export function functionIDLookup(algoID) {
     let functionToReturn = () => {
     };
-    switch (id) {
+    let label = InitialCardStates.filter(state => state.algoID === algoID)[0].text;
+    let processingOptions = InitialCardStates.filter(state => state.algoID === algoID)[0].processingOptions;
+    switch (algoID) {
         case 1: {
             functionToReturn = WrappedAlgorithms._convertRGBToGray;
             break;
@@ -147,5 +163,5 @@ export function functionIDLookup(id) {
         default: {
         }
     }
-    return functionToReturn;
+    return [functionToReturn, label, processingOptions];
 }
