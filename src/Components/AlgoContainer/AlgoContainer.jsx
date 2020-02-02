@@ -3,7 +3,7 @@ import {DndProvider, useDrop} from "react-dnd";
 import Card from "../Card/Card";
 import update from "immutability-helper";
 import ItemTypes from "../ItemTypes";
-import {functionIDLookup, InitialCardStates} from "../../Algorithms";
+import {functionIDLookup, allPossibleCards} from "../../Algorithms";
 import ProcessingParametersContainer from "../ProcessingParametersContainer";
 import NativeSelect from "@material-ui/core/NativeSelect";
 import InputLabel from "@material-ui/core/InputLabel";
@@ -23,8 +23,7 @@ const AlgoContainer = ({cards, setCards}) => {
         console.debug(algoId);
         console.debug(typeof algoId);
         console.debug(processingOptions);
-        setCards(
-            update(cards, {
+        setCards({
                 $push: [{
                     id: Math.max.apply(Math, cards.map(function (o) {
                         return o.id + 1;
@@ -33,26 +32,24 @@ const AlgoContainer = ({cards, setCards}) => {
                     text: label,
                     processingOptions: processingOptions,
                 }]
-            })
+            }
         );
     };
 
     const moveCard = (id, atIndex) => {
         const {card, index} = findCard(id);
-        setCards(
-            update(cards, {
+        setCards({
                 $splice: [[index, 1], [atIndex, 0, card]]
-            })
+            }
         );
     };
 
     const deleteCard = (id) => {
         const {card, index} = findCard(id);
         console.log(`aiyoh ${id} kena delete`);
-        setCards(
-            update(cards, {
+        setCards({
                 $splice: [[index, 1]]
-            })
+            }
         );
     };
 
@@ -68,15 +65,14 @@ const AlgoContainer = ({cards, setCards}) => {
         const {card, index} = findCard(id);
         console.debug(`got a value of ${value} for property ${property} in updateCard`);
 
-        setCards(
-            update(cards, {
+        setCards({
                 [index]: {
                     processingOptions: {
                         [property]:
                             {$set: value}
                     }
                 }
-            })
+            }
         );
     };
 
@@ -88,11 +84,7 @@ const AlgoContainer = ({cards, setCards}) => {
     );
 
     return (
-        <div style={{
-            display: "flex",
-            flexDirection: "column",
-            maxWidth: "30vw",
-        }}>
+        <>
             <div ref={drop}
                  className={"drag-and-drop-container"}>
                 <h2>Algorithms to run on input video (in order from top to bottom)</h2>
@@ -141,7 +133,7 @@ const AlgoContainer = ({cards, setCards}) => {
                     id: 'select-new-algo',
                 }}
                 >
-                    {InitialCardStates.map((cardState, id) => {
+                    {allPossibleCards.map((cardState, id) => {
                         return (
                             <option key={id} value={cardState.algoID}>{cardState.text}</option>
                         )
@@ -174,7 +166,7 @@ const AlgoContainer = ({cards, setCards}) => {
                     Add new algorithm
                 </Button>
             </form>
-        </div>
+        </>
     );
 };
 export default AlgoContainer;

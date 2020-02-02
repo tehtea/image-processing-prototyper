@@ -40,7 +40,9 @@ const WrappedAlgorithms = {
             window.cv.THRESH_BINARY,
             processingOptions.kernelSize,
             processingOptions.C);
-    }
+    },
+
+
 };
 
 export default WrappedAlgorithms;
@@ -67,7 +69,7 @@ export function executeWrappedAlgorithm(inputCanvas, outputCanvasID, processingO
     return document.getElementById(outputCanvasID);
 }
 
-export const InitialCardStates = [
+export const allPossibleCards = [
     {
         id: 1,
         algoID: 1,
@@ -130,8 +132,8 @@ export const InitialCardStates = [
 export function functionIDLookup(algoID) {
     let functionToReturn = () => {
     };
-    let label = InitialCardStates.filter(state => state.algoID === algoID)[0].text;
-    let processingOptions = InitialCardStates.filter(state => state.algoID === algoID)[0].processingOptions;
+    let label = allPossibleCards.filter(state => state.algoID === algoID)[0].text;
+    let processingOptions = allPossibleCards.filter(state => state.algoID === algoID)[0].processingOptions;
     switch (algoID) {
         case 1: {
             functionToReturn = WrappedAlgorithms._convertRGBToGray;

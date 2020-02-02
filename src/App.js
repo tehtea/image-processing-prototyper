@@ -16,22 +16,65 @@ import CanvasContainer from "./Components/CanvasContainer/CanvasContainer";
 // for the image processing algorithms
 import {INTERMEDIATE_OUTPUT_PREFIX, DELAY} from "./Constants";
 import {resolveOpenCVErrorNumber} from "./utils.js";
-import {executeWrappedAlgorithm, functionIDLookup, InitialCardStates} from "./Algorithms";
+import {executeWrappedAlgorithm, functionIDLookup, allPossibleCards} from "./Algorithms";
+import update from "immutability-helper";
 
 function App() {
+
+    // something like constructor
+    //////////////////////////////////////////////////
+    const videoConstraints = {
+        width: 1280,
+        height: 720,
+        facingMode: "user"
+    };
+    const webcamRef = React.useRef(null);
+
+    let appState = {
+        cards: allPossibleCards,
+        exceptionOccurred: false,
+    };
+
+    let [state, setState] = useState(appState);
+
+    let cards = state.cards;
+
+    let setCards = (setCardsSpec) => {
+        return setState(update(state, {
+            cards: setCardsSpec
+        }))
+    };
+
+    // entry point for image processing
+    const onUserMedia = () => {
+        window.webcam = webcamRef.current;
+    };
+    //////////////////////////////////////////////////
+
     // life saviour: https://upmostly.com/tutorials/setinterval-in-react-components-using-hooks
     useEffect(() => {
         if (!window.webcam)
             window.webcam = webcamRef.current;
 
-        if (window.cv)
-            console.log('opencv loaded');
-        else {
+        if (window.cv) {
+            if (state.exceptionOccurred) {
+                console.log("resetting this");
+                setState(
+                    update(state, {$toggle: ["exceptionOccurred"]})
+                );
+            }
+        } else {
             console.log('opencv not loaded, will exit');
             return;
         }
 
         const interval = setInterval(() => {
+
+            console.log(`exception occurred status: ${state.exceptionOccurred}`)
+            if (state.exceptionOccurred) {
+                console.debug("unresolved exception. Pipeline will not run.");
+                return;
+            }
 
             const originalCanvas = window.webcam.getCanvas();
 
@@ -59,34 +102,26 @@ function App() {
 
                 // do sth based on card id
                 try {
-                    let [functionToRun,,] = functionIDLookup(card.algoID);
+                    let [functionToRun, ,] = functionIDLookup(card.algoID);
                     currentCanvas = executeWrappedAlgorithm(currentCanvas,
                         INTERMEDIATE_OUTPUT_PREFIX + i,
                         card.processingOptions,
                         functionToRun);
                 } catch (err) {
-                    console.error(`Error using algorithm of id ${card.id}, error message: ${resolveOpenCVErrorNumber(err)}`);
+                    let errorText = `Error on card ${card.id}, which does ${card.text}. Error message: ${resolveOpenCVErrorNumber(err)}`;
+                    console.error(errorText);
+                    document.getElementById("error-text").innerText = errorText;
+                    if (!state.exceptionOccurred)
+                        setState(
+                            update(state, {$toggle: ["exceptionOccurred"]})
+                        )
                 }
             }
 
         }, DELAY);
 
         return () => clearInterval(interval);
-    });
-
-    const videoConstraints = {
-        width: 1280,
-        height: 720,
-        facingMode: "user"
-    };
-    const webcamRef = React.useRef(null);
-
-    let [cards, setCards] = useState(InitialCardStates);
-
-    // entry point for image processing
-    const onUserMedia = () => {
-        window.webcam = webcamRef.current;
-    };
+    }, [state.cards]);
 
     return (
         <div className="App">
@@ -107,10 +142,23 @@ function App() {
                 </div>
                 {/* DndProvider needed for drag and drop functionality in AlgoContainer */}
                 <DndProvider backend={Backend}>
-                    <AlgoContainer
-                        cards={cards}
-                        setCards={setCards}
-                    />
+                    <div style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        maxWidth: "30vw",
+                    }}>
+                        <p
+                            id="error-text"
+                            style={{
+                                color: "red",
+                                overflowWrap: "break-word",
+                            }}
+                        ></p>
+                        <AlgoContainer
+                            cards={cards}
+                            setCards={setCards}
+                        />
+                    </div>
                 </DndProvider>
             </div>
         </div>
